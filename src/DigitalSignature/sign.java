@@ -27,8 +27,8 @@ public class sign {
 
         temp= Base64.encode(checksum);
         System.out.println("Checksum base64 encoded " + temp);
-        for(int i=0;i<checksum.length;i++)
-            System.out.print(checksum[i]);
+        for (byte aChecksum : checksum)
+            System.out.print(aChecksum);
 
         //encrypt using DSA
         byte[]signature=encrypt(checksum);
@@ -36,16 +36,17 @@ public class sign {
         temp= Base64.encode(signature);
         System.out.println();
         System.out.println("Signature base64 encoded " + temp);
-        for(int i=0;i<signature.length;i++)
-            System.out.print(signature[i]);
+        for (byte aSignature : signature)
+            System.out.print(aSignature);
 
     }
 
     private static byte[] encrypt(byte[]checksum) {
 
         try {
-            KeyPairGenerator keyGen = KeyPairGenerator.getInstance("DSA");
-            keyGen.initialize(1024, new SecureRandom());
+            KeyPairGenerator keyGen = KeyPairGenerator.getInstance("DSA","SUN");
+            SecureRandom random = SecureRandom.getInstance("SHA1PRNG", "SUN");
+            keyGen.initialize(1024, random);
             KeyPair kp = keyGen.generateKeyPair();
             PrivateKey prKey = kp.getPrivate();
             PublicKey puKey = kp.getPublic();
@@ -55,10 +56,10 @@ public class sign {
             byte[] signature = sig.sign();
 
             File t=new File(filePath);
-            FileOutputStream f=new FileOutputStream(new File(t.getParent()+"s.sig"));
+            FileOutputStream f=new FileOutputStream(new File(t.getParent()+t.getName()+".sig"));
             f.write(signature);
             f.close();
-            f=new FileOutputStream(new File(t.getParent()+"public.sig"));
+            f=new FileOutputStream(new File(t.getParent()+t.getName()+".pKey"));
             byte[]temp=puKey.getEncoded();
             f.write(temp);
             f.close();
