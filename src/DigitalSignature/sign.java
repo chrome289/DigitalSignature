@@ -4,6 +4,7 @@ import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.security.*;
 
@@ -11,7 +12,11 @@ import java.security.*;
  * Created by Siddharth on 29-06-2015.
  */
 public class sign {
-    public void signit(String filePath) {
+    public static String filePath;
+    public void signit(String temp) {
+
+        filePath=temp;
+        //generate checksum using SHA1
         byte[] checksum=new byte[20];
         try {
              checksum= createSha1(new File(filePath));
@@ -20,11 +25,12 @@ public class sign {
         }
 
 
-        String temp= Base64.encode(checksum);
+        temp= Base64.encode(checksum);
         System.out.println("Checksum base64 encoded " + temp);
         for(int i=0;i<checksum.length;i++)
             System.out.print(checksum[i]);
 
+        //encrypt using DSA
         byte[]signature=encrypt(checksum);
 
         temp= Base64.encode(signature);
@@ -47,6 +53,15 @@ public class sign {
             sig.initSign(prKey);
             sig.update(checksum);
             byte[] signature = sig.sign();
+
+            File t=new File(filePath);
+            FileOutputStream f=new FileOutputStream(new File(t.getParent()+"s.sig"));
+            f.write(signature);
+            f.close();
+            f=new FileOutputStream(new File(t.getParent()+"public.sig"));
+            byte[]temp=puKey.getEncoded();
+            f.write(temp);
+            f.close();
             return signature;
 
         } catch (Exception e) {

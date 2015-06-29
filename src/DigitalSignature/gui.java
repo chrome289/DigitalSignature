@@ -19,7 +19,7 @@ public class gui {
             @Override
             public void actionPerformed(ActionEvent e) {
                 JFileChooser jf=new JFileChooser();
-                jf.setCurrentDirectory(new File("C:"+File.pathSeparator));
+                jf.setCurrentDirectory(new File("D:"+File.pathSeparator));
                 int result=jf.showOpenDialog(frame);
                 if(result==JFileChooser.APPROVE_OPTION) {
                     System.out.println(jf.getSelectedFile());
